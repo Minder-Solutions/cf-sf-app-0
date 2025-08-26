@@ -1,0 +1,26 @@
+{
+  "name": "cf-sf-app-0",
+  "compatibility_date": "2025-04-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "main": "./server.ts",
+  "assets": {
+    "directory": "./build/client"
+  },
+  "observability": {
+    "enabled": true
+  },
+  "upload_source_maps": true,
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "cf-sf-app-0_auth",
+      "database_id": "457745a6-eb45-480e-8b12-5726979d458e"  // This placeholder will be replaced during deployment
+    }
+  ],
+  "vars": {
+    "SHOPIFY_API_KEY": "x", // Don't use this in production, use secrets in the dashboard https://developers.cloudflare.com/workers/configuration/secrets/#adding-secrets-to-your-project
+    "SHOPIFY_API_SECRET": "x", // Don't use this in production, use secrets in the dashboard https://developers.cloudflare.com/workers/configuration/secrets/#adding-secrets-to-your-project
+    "SHOPIFY_APP_URL": "x", // adjust as needed
+    "SCOPES": "write_products" // adjust scopes as needed
+  }
+}
