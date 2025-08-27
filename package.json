@@ -2,17 +2,10 @@
   "name": "cf-sf-app-0",
   "version": "0.0.1",
   "description": "cloudflare workers host shopify app cloudflare tunnel in scripts command for dev",
-  "myBuildNotes": {
-    "wrangler-main" : {
-      "notes": "on the main branch wrangler needs to be at 4",
-      "wrangler": "^4.13.2"
-    },
-    "wrangler-dev": {
-      "notes": "when running cf:dev wrangler needs to be at 3",
-      "wrangler": "^3.114.4"
-    },
-    "never": "never push the package.lock file to origin main and always make sure wrangler is at 4 on origin main",
-    "reason": "A cloudflare github app deploys to a cloudflare worker from origin main.  It needs wrangler 4 for the build vite requires it and will fail without it."
+  "myBuildNoteWrangler": {
+    "wrangler-versions": "on the main branch wrangler needs to be at 4, when running cf:dev wrangler needs to be at 3",
+    "never": "push the package.lock file to origin main and always make sure wrangler is at 4 on origin main",
+    "reason": "The cloudflare github app deploys to the cloudflare worker from origin main.  It needs wrangler 4 for its build and it will fail without it. Remix run dev needs wrangler at 3 for the local tunnel."
   },
   "cloudflare": {
     "label": "Remix Framework Starter",
@@ -58,6 +51,10 @@
     "vite-tsconfig-paths": "^5.1.4",
     "wrangler": "^4.13.2"
   },
+  "manual-revisions": {
+    "wrangler-production-main": "^4.13.2",
+    "wrangler-development-never-main": "^3.114.4"
+  },
   "engines": {
     "node": ">=20.0.0"
   },
@@ -71,7 +68,7 @@
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
     "typecheck": "tsc",
     "typegen": "wrangler types",
-    "cf:tunnel": "cloudflared tunnel run --token eyJhIjoiMjI5ZjA2N2ViYjQ3YTFjZjhhODFmMDE4MjFmZjUxM2YiLCJ0IjoiNDIwNzcyNTYtNGZmMS00MDg1LWI5ZDgtNmE4ODU0N2M5YmQ2IiwicyI6Ik1ERmhaalk0TnpNdE5qVTJOaTAwWWpabUxXSmxZbUl0WkRkaVpXUmtNRFppTnpVMiJ9",
+    "cf:tunnel": "cloudflared tunnel run --token $CF_TUNNEL_TOKEN",
     "cf:dev": "shopify app dev --tunnel-url https://dev-tunnel.minder.solutions:5500",
     "packages:show": "npm list --depth=0"
   },
