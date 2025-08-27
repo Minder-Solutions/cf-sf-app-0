@@ -200,6 +200,9 @@ export const authenticate = {
   },
   public: (request: Request) => {
     return getShopifyApp().authenticate.public(request);
+  },
+  webhook: (request: Request) => {
+    return getShopifyApp().authenticate.webhook(request);
   }
 };
 
