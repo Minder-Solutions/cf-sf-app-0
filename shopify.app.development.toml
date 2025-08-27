@@ -1,14 +1,14 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
-client_id = "f7819887f2907d0d3cbd6644e8fa583a"
-name = "minder-cf-app-sf-setup-0-dev"
-handle = "minder-cf-app-sf-setup-0-dev"
+client_id = "6894f22e39e185bef9dada4628044f8a"
+name = "cf-sf-app-0_dev"
+handle = "cf-sf-app-0_dev"
 application_url = "https://dev-tunnel.minder.solutions"
 embedded = true
 
 [build]
 include_config_on_deploy = true
-automatically_update_urls_on_dev = true
+automatically_update_urls_on_dev = false
 
 [webhooks]
 api_version = "2025-04"
@@ -26,7 +26,7 @@ api_version = "2025-04"
 scopes = "write_products"
 
 [auth]
-redirect_urls = ["https://dev-tunnel.minder.solutions/auth/callback", "https://dev-tunnel.minder.solutions/auth/shopify/callback", "https://dev-tunnel.minder.solutions/api/auth/callback"]
+redirect_urls = ["https://dev-tunnel.minder.solutions/auth/callback"]
 
 [pos]
 embedded = false
