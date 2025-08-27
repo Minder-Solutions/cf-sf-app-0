@@ -16,7 +16,7 @@ import {
 import { TitleBar, useAppBridge } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
 
-const MESSAGE = 'Hello this is the bare starting point last commit was in DEV';
+const MESSAGE = 'This is a basic template for cloudflare with a dep issue on wrangler';
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
  await authenticate.admin(request);

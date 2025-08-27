@@ -18,12 +18,12 @@
     }
   ]
   // 
-  ,
-  "vars": {
-    "SHOPIFY_API_KEY": "69ac55ffe47bb1962a10be0573f34495",
-    "SHOPIFY_API_SECRET": "2c8af223f90828e5d57f9e08632f9a84",
-    "SHOPIFY_APP_URL": "cf-sf-app-0.minder-solutions.workers.dev",
-    "SCOPES": "write_products"
-  }
+  // ,
+  // "vars": {
+  //   "SHOPIFY_API_KEY": "69ac55ffe47bb1962a10be0573f34495",
+  //   "SHOPIFY_API_SECRET": "2c8af223f90828e5d57f9e08632f9a84",
+  //   "SHOPIFY_APP_URL": "cf-sf-app-0.minder-solutions.workers.dev",
+  //   "SCOPES": "write_products"
+  // }
   // 
 }
