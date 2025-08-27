@@ -4,8 +4,8 @@
 client_id = "69ac55ffe47bb1962a10be0573f34495"
 
 
-name = "cf-sf-app-0_prod"
-handle = "cf-sf-app-0_prod"
+name = "cf-sf-app-0-prod"
+handle = "cf-sf-app-0-prod"
 application_url = "https://cf-sf-app-0.minder-solutions.workers.dev"
 embedded = true
 
