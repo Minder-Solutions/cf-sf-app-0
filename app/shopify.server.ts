@@ -4,188 +4,149 @@ import {
   AppDistribution,
   shopifyApp,
 } from "@shopify/shopify-app-remix/server";
-import { D1Database } from "@cloudflare/workers-types";
-import { Session } from "@shopify/shopify-api";
-import { SessionStorage } from "@shopify/shopify-app-session-storage";
+import { KVSessionStorage } from "@shopify/shopify-app-session-storage-kv";
 
-// Define type for the global DB
+/**
+ * Shopify KV Session Storage Implementation
+ * 
+ * This module implements Shopify session storage using Cloudflare KV.
+ * It's designed to work in a serverless environment where each request
+ * gets a fresh execution context.
+ * 
+ * Key patterns:
+ * 1. Store session storage and KV namespace in globalThis to persist between function calls
+ * 2. Initialize KV namespace before creating the Shopify app instance
+ * 3. Use a flag to track if namespace has been properly set
+ * 4. Lazy initialization of the Shopify app instance
+ */
+
+// Define type for the global shopify app instance and session storage
 declare global {
-  var shopifyDb: D1Database | undefined;
   var shopifyAppInstance: ReturnType<typeof shopifyApp> | undefined;
+  var shopifyKvNamespace: KVNamespace | undefined;
+  var shopifySessionStorage: KVSessionStorage | undefined;
+  var shopifyNamespaceInitialized: boolean | undefined;
 }
 
-// Create a D1 session storage adapter
-class D1SessionStorage implements SessionStorage {
-  async storeSession(session: Session): Promise<boolean> {
-    const db = globalThis.shopifyDb;
-    if (!db) {
-      console.error("D1 database not initialized");
-      return false;
-    }
-
-    try {
-      await db.prepare(`
-        INSERT OR REPLACE INTO shopify_sessions
-        (id, shop, state, isOnline, scope, accessToken, expires, onlineAccessInfo)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-      `).bind(
-        session.id || null,
-        session.shop || null,
-        session.state || null,
-        session.isOnline ? 1 : 0,
-        session.scope || null,
-        session.accessToken || null,
-        session.expires ? session.expires.getTime() : null,
-        session.onlineAccessInfo ? JSON.stringify(session.onlineAccessInfo) : null
-      ).run();
-      return true;
-    } catch (error) {
-      console.error("Failed to store session:", error);
-      return false;
-    }
-  }
-
-  async loadSession(id: string): Promise<Session | undefined> {
-    const db = globalThis.shopifyDb;
-    if (!db) {
-      console.error("D1 database not initialized");
-      return undefined;
-    }
-
-    try {
-      const result = await db.prepare(`
-        SELECT * FROM shopify_sessions WHERE id = ?
-      `).bind(id || null).first();
-      
-      if (!result) return undefined;
-      
-      const session = new Session({
-        id: result.id as string,
-        shop: result.shop as string,
-        state: result.state as string,
-        isOnline: Boolean(result.isOnline),
-      });
-
-      session.scope = result.scope as string;
-      session.accessToken = result.accessToken as string;
-      
-      if (result.expires) {
-        session.expires = new Date(result.expires as number);
-      }
-      
-      if (result.onlineAccessInfo) {
-        session.onlineAccessInfo = JSON.parse(result.onlineAccessInfo as string);
-      }
-      
-      return session;
-    } catch (error) {
-      console.error("Failed to load session:", error);
-      return undefined;
-    }
-  }
-
-  async deleteSession(id: string): Promise<boolean> {
-    const db = globalThis.shopifyDb;
-    if (!db) {
-      console.error("D1 database not initialized");
-      return false;
-    }
-
-    try {
-      await db.prepare(`
-        DELETE FROM shopify_sessions WHERE id = ?
-      `).bind(id || null).run();
-      return true;
-    } catch (error) {
-      console.error("Failed to delete session:", error);
-      return false;
-    }
-  }
-
-  async deleteSessions(ids: string[]): Promise<boolean> {
-    const db = globalThis.shopifyDb;
-    if (!db) {
-      console.error("D1 database not initialized");
-      return false;
-    }
-
-    try {
-      for (const id of ids) {
-        await this.deleteSession(id);
-      }
-      return true;
-    } catch (error) {
-      console.error("Failed to delete sessions:", error);
-      return false;
-    }
-  }
-
-  async findSessionsByShop(shop: string): Promise<Session[]> {
-    const db = globalThis.shopifyDb;
-    if (!db) {
-      console.error("D1 database not initialized");
-      return [];
-    }
-
-    try {
-      const results = await db.prepare(`
-        SELECT * FROM shopify_sessions WHERE shop = ?
-      `).bind(shop || null).all();
-      
-      return results.results.map(result => {
-        const session = new Session({
-          id: result.id as string,
-          shop: result.shop as string,
-          state: result.state as string,
-          isOnline: Boolean(result.isOnline),
-        });
-
-        session.scope = result.scope as string;
-        session.accessToken = result.accessToken as string;
-        
-        if (result.expires) {
-          session.expires = new Date(result.expires as number);
-        }
-        
-        if (result.onlineAccessInfo) {
-          session.onlineAccessInfo = JSON.parse(result.onlineAccessInfo as string);
-        }
-        
-        return session;
-      });
-    } catch (error) {
-      console.error("Failed to find sessions by shop:", error);
-      return [];
-    }
-  }
+// Initialize KV session storage globally to ensure it persists between requests
+if (!globalThis.shopifySessionStorage) {
+  globalThis.shopifySessionStorage = new KVSessionStorage();
+  // console.log("Created global KVSessionStorage instance");
 }
 
-// Create a single instance of the session storage
-const sessionStorage = new D1SessionStorage();
+/**
+ * Sets the KV namespace for session storage
+ * 
+ * This function must be called before any Shopify app operations.
+ * It configures the KV namespace that will be used for storing session data.
+ * The function is idempotent and can be called multiple times without issues.
+ */
+export const setKvNamespace = (kvNamespace: KVNamespace) => {
+  if (!kvNamespace) {
+    console.error("No KV namespace provided to setKvNamespace");
+    return;
+  }
+
+  // Store namespace globally
+  globalThis.shopifyKvNamespace = kvNamespace;
+  
+  // Always use the global session storage instance
+  if (!globalThis.shopifySessionStorage) {
+    globalThis.shopifySessionStorage = new KVSessionStorage();
+    // console.log("Created new global KVSessionStorage instance in setKvNamespace");
+  }
+  
+  // Set the namespace
+  globalThis.shopifySessionStorage.setNamespace(kvNamespace);
+  
+  // Mark that the namespace has been initialized
+  globalThis.shopifyNamespaceInitialized = true;
+  
+  // Reset the app instance to ensure it's created with the properly configured session storage
+  globalThis.shopifyAppInstance = undefined;
+  
+  // console.log("KV namespace set for Shopify session storage");
+};
 
 // Function to get or create the Shopify app instance
-function getShopifyApp() {
-  if (!globalThis.shopifyAppInstance) {
-    globalThis.shopifyAppInstance = shopifyApp({
-      apiKey: process.env.SHOPIFY_API_KEY,
-      apiSecretKey: process.env.SHOPIFY_API_SECRET || "",
-      apiVersion: ApiVersion.January25,
-      scopes: process.env.SCOPES?.split(","),
-      appUrl: process.env.SHOPIFY_APP_URL || "",
-      authPathPrefix: "/auth",
-      sessionStorage,
-      distribution: AppDistribution.AppStore,
-      future: {
-        unstable_newEmbeddedAuthStrategy: true,
-        removeRest: true,
-      },
-      ...(process.env.SHOP_CUSTOM_DOMAIN
-        ? { customShopDomains: [process.env.SHOP_CUSTOM_DOMAIN] }
-        : {}),
-    });
+/**
+ * Get or create a new Shopify app instance
+ * 
+ * This function implements a singleton pattern with recovery mechanisms:
+ * 1. Returns existing app instance if available and namespace is initialized
+ * 2. Attempts recovery if namespace exists but isn't marked as initialized
+ * 3. Creates a new instance if needed, with session storage
+ * 4. Performs error checking and reporting at each step
+ * 
+ * The approach ensures we don't create unnecessary app instances while
+ * providing robustness in the serverless environment.
+ * 
+ * @returns The Shopify app instance
+ */
+const getShopifyApp = () => {
+  // Always ensure we have a KV namespace configured
+  if (!globalThis.shopifyKvNamespace) {
+    console.error("No KV namespace available for Shopify app. Was setKvNamespace called?");
   }
+
+  // If namespace flag not set, try to recover if possible
+  if (!globalThis.shopifyNamespaceInitialized && globalThis.shopifyKvNamespace) {
+    console.warn("Namespace was not marked as initialized, but a namespace exists. Attempting to recover...");
+    
+    // Recover by setting the namespace again
+    if (globalThis.shopifySessionStorage && globalThis.shopifyKvNamespace) {
+      globalThis.shopifySessionStorage.setNamespace(globalThis.shopifyKvNamespace);
+      globalThis.shopifyNamespaceInitialized = true;
+      console.log("Recovery successful: Namespace re-initialized");
+    }
+  }
+  
+  // Return existing instance if available and namespace is properly initialized
+  if (globalThis.shopifyAppInstance && globalThis.shopifyNamespaceInitialized) {
+    return globalThis.shopifyAppInstance;
+  }
+  
+  // Create a new app instance using the global session storage
+  if (!globalThis.shopifySessionStorage) {
+    console.error("No session storage available for Shopify app.");
+    
+    // Last-ditch recovery attempt if we have a namespace
+    if (globalThis.shopifyKvNamespace) {
+      console.warn("Creating new session storage as fallback...");
+      globalThis.shopifySessionStorage = new KVSessionStorage();
+      globalThis.shopifySessionStorage.setNamespace(globalThis.shopifyKvNamespace);
+      globalThis.shopifyNamespaceInitialized = true;
+    } else {
+      // Critical failure - cannot continue without namespace
+      throw new Error("Failed to initialize Shopify app: No KV namespace available");
+    }
+  }
+
+  const shopifyConfig = {
+    apiKey: process.env.SHOPIFY_API_KEY || "",
+    apiSecretKey: process.env.SHOPIFY_API_SECRET || "",
+    scopes: process.env.SCOPES?.split(",") || [],
+    appUrl: process.env.SHOPIFY_APP_URL || "",
+    distribution: AppDistribution.AppStore,
+    apiVersion: ApiVersion.July23,
+    isEmbeddedApp: true,
+    sessionStorage: globalThis.shopifySessionStorage,
+    future: {
+      unstable_newEmbeddedAuthStrategy: true,
+    }
+  };
+
+  // console.log("Creating new Shopify app instance");
+  globalThis.shopifyAppInstance = shopifyApp(shopifyConfig);
+  
   return globalThis.shopifyAppInstance;
-}
+};
+
+// Getter for the current session storage instance
+// Always get sessionStorage from the current app instance to ensure proper initialization
+export const getSessionStorage = () => {
+  return getShopifyApp().sessionStorage;
+};
 
 export const apiVersion = ApiVersion.January25;
 
@@ -206,6 +167,7 @@ export const authenticate = {
   }
 };
 
+
 export const unauthenticated = {
   admin: (request: Request) => {
     return getShopifyApp().unauthenticated.admin(request);
@@ -223,30 +185,7 @@ export const registerWebhooks = (request: Request) => {
   return getShopifyApp().registerWebhooks(request);
 };
 
-// Function to initialize the database for the session storage
-export async function initializeDb(db: D1Database) {
-  try {
-    // Create the sessions table if it doesn't exist - all on one line
-    await db.exec(`CREATE TABLE IF NOT EXISTS shopify_sessions (id TEXT PRIMARY KEY, shop TEXT NOT NULL, state TEXT, isOnline INTEGER, scope TEXT, accessToken TEXT, expires INTEGER, onlineAccessInfo TEXT)`);
 
-    // Set the global DB instance
-    globalThis.shopifyDb = db;
-    
-    console.log("D1 database initialized successfully for session storage");
-    return true;
-  } catch (error) {
-    console.error("Failed to initialize D1 database:", error);
-    return false;
-  }
-}
-
-// Add a function that can be called from load-context.ts
-export function setupDb(env: any) {
-  if (env?.DB && !globalThis.shopifyDb) {
-    // Initialize the database if it exists and hasn't been initialized
-    initializeDb(env.DB).catch(console.error);
-  }
-}
 
 export default {
   apiVersion,
@@ -254,5 +193,6 @@ export default {
   unauthenticated,
   login,
   registerWebhooks,
-  addDocumentResponseHeaders
+  addDocumentResponseHeaders,
+  setKvNamespace
 };

@@ -1,4 +1,10 @@
 # Initial Consideratins
+
+https://developers.cloudflare.com/workers/runtime-apis/bindings/
+
+https://developers.cloudflare.com/kv/api/
+
+
 Setup two apps one for production, one for development both in the shopify partner UI.
 [partnersUI](https://partners.shopify.com/)
 # dev instructions
