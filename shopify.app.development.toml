@@ -1,8 +1,8 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
 client_id = "6894f22e39e185bef9dada4628044f8a"
-name = "cf-sf-app-0_dev"
-handle = "cf-sf-app-0_dev"
+name = "cf-sf-app-0-dev"
+handle = "cf-sf-app-0-dev"
 application_url = "https://dev-tunnel.minder.solutions"
 embedded = true
 

@@ -1,6 +1,5 @@
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { authenticate } from "../shopify.server";
-import db from "../db.server";
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { shop, session, topic } = await authenticate.webhook(request);
@@ -10,7 +9,13 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   // Webhook requests can trigger multiple times and after an app has already been uninstalled.
   // If this webhook already ran, the session may have been deleted previously.
   if (session) {
-    await db.session.deleteMany({ where: { shop } });
+    // Example of how to delete shop sessions directly using DB
+    if (globalThis.DB) {
+      console.log("Deleting sessions for shop:", shop);
+      await globalThis.DB.prepare(`DELETE FROM shopify_sessions WHERE shop = ?`).bind(shop).run();
+    } else {
+      console.log("Database not initialized, cannot delete sessions");
+    }
   }
 
   return new Response();

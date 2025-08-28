@@ -1,5 +1,5 @@
 import { type PlatformProxy } from "wrangler";
-import { setupDb } from "./app/shopify.server";
+import { createTables } from './app/database.server';
 
 type GetLoadContextArgs = {
   request: Request;
@@ -19,9 +19,13 @@ declare module "@remix-run/cloudflare" {
 }
 
 export function getLoadContext({ context }: GetLoadContextArgs) {
-  // Initialize the DB if available
-  if (context.cloudflare?.env) {
-    setupDb(context.cloudflare.env);
+  // Initialize DB if available and not already initialized
+  if (context.cloudflare?.env?.DB && !globalThis.DB) {
+    // Store the DB instance globally
+    globalThis.DB = context.cloudflare.env.DB;
+    
+    // Create tables
+    createTables(globalThis.DB).catch(console.error);
   }
   
   return context;

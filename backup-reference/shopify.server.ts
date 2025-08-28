@@ -8,21 +8,23 @@ import { D1Database } from "@cloudflare/workers-types";
 import { Session } from "@shopify/shopify-api";
 import { SessionStorage } from "@shopify/shopify-app-session-storage";
 
-// Define type for the global shopify app instance
+// Define type for the global DB
 declare global {
+  var shopifyDb: D1Database | undefined;
   var shopifyAppInstance: ReturnType<typeof shopifyApp> | undefined;
 }
 
 // Create a D1 session storage adapter
 class D1SessionStorage implements SessionStorage {
   async storeSession(session: Session): Promise<boolean> {
-    if (!globalThis.DB) {
+    const db = globalThis.shopifyDb;
+    if (!db) {
       console.error("D1 database not initialized");
       return false;
     }
 
     try {
-      await globalThis.DB.prepare(`
+      await db.prepare(`
         INSERT OR REPLACE INTO shopify_sessions
         (id, shop, state, isOnline, scope, accessToken, expires, onlineAccessInfo)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
@@ -44,13 +46,14 @@ class D1SessionStorage implements SessionStorage {
   }
 
   async loadSession(id: string): Promise<Session | undefined> {
-    if (!globalThis.DB) {
+    const db = globalThis.shopifyDb;
+    if (!db) {
       console.error("D1 database not initialized");
       return undefined;
     }
 
     try {
-      const result = await globalThis.DB.prepare(`
+      const result = await db.prepare(`
         SELECT * FROM shopify_sessions WHERE id = ?
       `).bind(id || null).first();
       
@@ -82,13 +85,14 @@ class D1SessionStorage implements SessionStorage {
   }
 
   async deleteSession(id: string): Promise<boolean> {
-    if (!globalThis.DB) {
+    const db = globalThis.shopifyDb;
+    if (!db) {
       console.error("D1 database not initialized");
       return false;
     }
 
     try {
-      await globalThis.DB.prepare(`
+      await db.prepare(`
         DELETE FROM shopify_sessions WHERE id = ?
       `).bind(id || null).run();
       return true;
@@ -99,7 +103,8 @@ class D1SessionStorage implements SessionStorage {
   }
 
   async deleteSessions(ids: string[]): Promise<boolean> {
-    if (!globalThis.DB) {
+    const db = globalThis.shopifyDb;
+    if (!db) {
       console.error("D1 database not initialized");
       return false;
     }
@@ -116,13 +121,14 @@ class D1SessionStorage implements SessionStorage {
   }
 
   async findSessionsByShop(shop: string): Promise<Session[]> {
-    if (!globalThis.DB) {
+    const db = globalThis.shopifyDb;
+    if (!db) {
       console.error("D1 database not initialized");
       return [];
     }
 
     try {
-      const results = await globalThis.DB.prepare(`
+      const results = await db.prepare(`
         SELECT * FROM shopify_sessions WHERE shop = ?
       `).bind(shop || null).all();
       
@@ -216,6 +222,31 @@ export const login = (request: Request) => {
 export const registerWebhooks = (request: Request) => {
   return getShopifyApp().registerWebhooks(request);
 };
+
+// Function to initialize the database for the session storage
+export async function initializeDb(db: D1Database) {
+  try {
+    // Create the sessions table if it doesn't exist - all on one line
+    await db.exec(`CREATE TABLE IF NOT EXISTS shopify_sessions (id TEXT PRIMARY KEY, shop TEXT NOT NULL, state TEXT, isOnline INTEGER, scope TEXT, accessToken TEXT, expires INTEGER, onlineAccessInfo TEXT)`);
+
+    // Set the global DB instance
+    globalThis.shopifyDb = db;
+    
+    console.log("D1 database initialized successfully for session storage");
+    return true;
+  } catch (error) {
+    console.error("Failed to initialize D1 database:", error);
+    return false;
+  }
+}
+
+// Add a function that can be called from load-context.ts
+export function setupDb(env: any) {
+  if (env?.DB && !globalThis.shopifyDb) {
+    // Initialize the database if it exists and hasn't been initialized
+    initializeDb(env.DB).catch(console.error);
+  }
+}
 
 export default {
   apiVersion,
