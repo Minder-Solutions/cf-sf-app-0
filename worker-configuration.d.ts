@@ -2,4 +2,13 @@
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface,@typescript-eslint/no-empty-object-type
 interface Env {
+  DB: D1Database;
+  SESSIONS_KV: KVNamespace;
+  
+  // Add any other bindings your Worker uses
+  SHOPIFY_API_KEY: string;
+  SHOPIFY_API_SECRET: string;
+  SHOPIFY_APP_URL: string;
+  SCOPES: string;
+  SHOP_CUSTOM_DOMAIN?: string;
 }

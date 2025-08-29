@@ -1,5 +1,6 @@
 import { type PlatformProxy } from "wrangler";
 import { createTables } from './app/database.server';
+import { setKvNamespace } from './app/shopify.server';
 
 type GetLoadContextArgs = {
   request: Request;
@@ -20,12 +21,17 @@ declare module "@remix-run/cloudflare" {
 
 export function getLoadContext({ context }: GetLoadContextArgs) {
   // Initialize DB if available and not already initialized
-  if (context.cloudflare?.env?.DB && !globalThis.DB) {
-    // Store the DB instance globally
-    globalThis.DB = context.cloudflare.env.DB;
+  // if (context.cloudflare?.env?.DB && !globalThis.DB) {
+  //   // Store the DB instance globally
+  //   globalThis.DB = context.cloudflare.env.DB;
     
-    // Create tables
-    createTables(globalThis.DB).catch(console.error);
+  //   // Create tables
+  //   createTables(globalThis.DB).catch(console.error);
+  // }
+  
+  // Initialize KV namespace for session storage if available
+  if (context.cloudflare?.env?.SESSIONS_KV) {
+    setKvNamespace(context.cloudflare.env.SESSIONS_KV);
   }
   
   return context;
