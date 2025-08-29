@@ -131,6 +131,9 @@ export const getShopifyApp = () => {
     apiVersion: ApiVersion.July23,
     isEmbeddedApp: true,
     sessionStorage: globalThis.shopifySessionStorage,
+    future: {
+      unstable_newEmbeddedAuthStrategy: true,
+    }
   };
 
   // console.log("Creating new Shopify app instance");
