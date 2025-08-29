@@ -142,6 +142,12 @@ export const getShopifyApp = () => {
   return globalThis.shopifyAppInstance;
 };
 
+// Getter for the current session storage instance
+// Always get sessionStorage from the current app instance to ensure proper initialization
+export const getSessionStorage = () => {
+  return getShopifyApp().sessionStorage;
+};
+
 export const apiVersion = ApiVersion.January25;
 
 // Lazy-load the shopify app when these functions are called
@@ -161,6 +167,7 @@ export const authenticate = {
   }
 };
 
+
 export const unauthenticated = {
   admin: (request: Request) => {
     return getShopifyApp().unauthenticated.admin(request);
@@ -177,6 +184,8 @@ export const login = (request: Request) => {
 export const registerWebhooks = (request: Request) => {
   return getShopifyApp().registerWebhooks(request);
 };
+
+
 
 export default {
   apiVersion,
