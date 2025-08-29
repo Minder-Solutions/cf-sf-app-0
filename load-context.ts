@@ -2,6 +2,19 @@ import { type PlatformProxy } from "wrangler";
 import { createTables } from './app/database.server';
 import { setKvNamespace } from './app/shopify.server';
 
+/**
+ * load-context.ts
+ * 
+ * This file is responsible for setting up the request context for the Remix app
+ * in a Cloudflare Workers environment. It initializes the KV namespace for session
+ * storage at the beginning of each request.
+ * 
+ * The context setup follows these key principles:
+ * 1. Early initialization of KV namespace to ensure it's available for the entire request
+ * 2. Graceful handling of missing bindings
+ * 3. Minimal logging to reduce noise in production
+ */
+
 type GetLoadContextArgs = {
   request: Request;
   context: {
@@ -29,7 +42,14 @@ export function getLoadContext({ context }: GetLoadContextArgs) {
   //   createTables(globalThis.DB).catch(console.error);
   // }
   
-  // Initialize KV namespace for session storage if available
+  /**
+   * KV Namespace Initialization
+   * 
+   * Initialize the KV namespace for Shopify session storage at the beginning of each request.
+   * This ensures that all Shopify operations within this request have access to the same
+   * namespace for session data. The setKvNamespace function handles deduplication internally
+   * through the shopifyNamespaceInitialized flag, so calling it multiple times is safe.
+   */
   if (context.cloudflare?.env?.SESSIONS_KV) {
     // Only log in development or on first initialization
     // console.log("Setting SESSIONS_KV namespace");
