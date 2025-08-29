@@ -16,7 +16,7 @@ declare global {
 // Initialize KV session storage globally to ensure it persists between requests
 if (!globalThis.shopifySessionStorage) {
   globalThis.shopifySessionStorage = new KVSessionStorage();
-  console.log("Created global KVSessionStorage instance");
+  // console.log("Created global KVSessionStorage instance");
 }
 
 // Set the KV namespace for the session storage
@@ -32,7 +32,7 @@ export const setKvNamespace = (kvNamespace: KVNamespace) => {
   // Always use the global session storage instance
   if (!globalThis.shopifySessionStorage) {
     globalThis.shopifySessionStorage = new KVSessionStorage();
-    console.log("Created new global KVSessionStorage instance in setKvNamespace");
+    // console.log("Created new global KVSessionStorage instance in setKvNamespace");
   }
   
   // Set the namespace
@@ -41,7 +41,7 @@ export const setKvNamespace = (kvNamespace: KVNamespace) => {
   // Reset the app instance to ensure it's created with the properly configured session storage
   globalThis.shopifyAppInstance = undefined;
   
-  console.log("KV namespace set for Shopify session storage");
+  // console.log("KV namespace set for Shopify session storage");
 };
 
 // Function to get or create the Shopify app instance
@@ -58,12 +58,12 @@ function getShopifyApp() {
     
     if (globalThis.shopifyKvNamespace) {
       globalThis.shopifySessionStorage.setNamespace(globalThis.shopifyKvNamespace);
-      console.log("Created and initialized new session storage with existing namespace");
+      // console.log("Created and initialized new session storage with existing namespace");
     }
   }
   
   if (!globalThis.shopifyAppInstance) {
-    console.log("Creating new Shopify app instance");
+    // console.log("Creating new Shopify app instance");
     
     globalThis.shopifyAppInstance = shopifyApp({
       apiKey: process.env.SHOPIFY_API_KEY,
