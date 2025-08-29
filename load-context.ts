@@ -31,7 +31,18 @@ export function getLoadContext({ context }: GetLoadContextArgs) {
   
   // Initialize KV namespace for session storage if available
   if (context.cloudflare?.env?.SESSIONS_KV) {
-    setKvNamespace(context.cloudflare.env.SESSIONS_KV);
+    console.log("SESSIONS_KV is available, setting namespace");
+    const kvNamespace = context.cloudflare.env.SESSIONS_KV;
+    
+    // Verify the KV namespace has the expected methods before setting
+    if (typeof kvNamespace.get === 'function') {
+      console.log("KV namespace has get method - looks valid");
+      setKvNamespace(kvNamespace);
+    } else {
+      console.error("KV namespace appears invalid - missing get method", kvNamespace);
+    }
+  } else {
+    console.error("SESSIONS_KV not found in environment variables", context.cloudflare?.env);
   }
   
   return context;
