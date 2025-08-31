@@ -5,7 +5,7 @@ import { AppProvider } from "@shopify/shopify-app-remix/react";
 import { NavMenu } from "@shopify/app-bridge-react";
 
 
-import { authenticate } from "../shopify.server";
+import { authenticate } from "app/shopify.server";
 
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
@@ -24,7 +24,6 @@ export default function App() {
           Home
         </Link>
         <Link to="/app/d1example">D1 Example</Link>
-        <Link to="/app/additional">Additional page</Link>
       </NavMenu>
       <Outlet />
     </AppProvider>

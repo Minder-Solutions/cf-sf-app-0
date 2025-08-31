@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { Page, Layout, Card, Text, BlockStack, Checkbox } from "@shopify/polaris";
 import { useAppBridge } from "@shopify/app-bridge-react";
-import { authenticate } from "../shopify.server";
-import dbService from "../services/db.service";
 import { json, useLoaderData, useFetcher } from "@remix-run/react";
+import { authenticate } from "app/shopify.server";
+import dbService from "app/services/db.service";
 
 // Constants for table names
 const DB1_TABLE = "example_table";

@@ -14,7 +14,7 @@ import {
  InlineStack,
 } from "@shopify/polaris";
 import { TitleBar, useAppBridge } from "@shopify/app-bridge-react";
-import { authenticate } from "../shopify.server";
+import { authenticate } from "app/shopify.server";
 
 const MESSAGE = 'This is a basic template for cloudflare with a dep issue on wrangler';
 
