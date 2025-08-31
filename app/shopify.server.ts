@@ -83,7 +83,7 @@ export const setKvNamespace = (kvNamespace: KVNamespace) => {
  * 
  * @returns The Shopify app instance
  */
-export const getShopifyApp = () => {
+const getShopifyApp = () => {
   // Always ensure we have a KV namespace configured
   if (!globalThis.shopifyKvNamespace) {
     console.error("No KV namespace available for Shopify app. Was setKvNamespace called?");
