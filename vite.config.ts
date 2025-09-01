@@ -59,6 +59,7 @@ export default defineConfig({
   },
   plugins: [
     cloudflareDevProxyVitePlugin({
+      // environment: "development",
       getLoadContext,
     }),
     remix({
@@ -89,3 +90,5 @@ export default defineConfig({
     include: ["@shopify/app-bridge-react", "@shopify/polaris"],
   },
 }) satisfies UserConfig;
+
+// https://chatgpt.com/c/68b5e286-1400-8327-8cd0-f222b9ccc534

@@ -4,28 +4,11 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
-  useNavigate,
 } from "@remix-run/react";
-import { useEffect } from "react";
+import { useClientLog } from "./resources/hooks/useClientLog";
 
-// https://shopify.dev/docs/api/app-home/using-polaris-components
 export default function App() {
-  const navigate = useNavigate();
-  
-  useEffect(() => {
-    //@ts-ignore
-    const handleNavigate = (event) => {
-      const target = event.detail?.target || event.target;
-      const href = target.getAttribute('href');
-      if (href) navigate(href);
-    };
-
-    document.addEventListener('shopify:navigate', handleNavigate);
-    return () => {
-      document.removeEventListener('shopify:navigate', handleNavigate);
-    };
-  }, [navigate]);
-
+  useClientLog();
   return (
     <html>
       <head>
@@ -47,7 +30,6 @@ export default function App() {
         <Outlet />
         <ScrollRestoration />
         <Scripts />
-        <script src="https://cdn.shopify.com/shopifycloud/app-bridge-ui-experimental.js"></script>
       </body>
     </html>
   );

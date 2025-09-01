@@ -1,7 +1,9 @@
 {
   "name": "cf-sf-app-0",
   "compatibility_date": "2025-04-01",
-  "compatibility_flags": ["nodejs_compat"],
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
   "main": "./server.ts",
   "assets": {
     "directory": "./build/client"
@@ -14,7 +16,7 @@
     {
       "binding": "DB",
       "database_name": "cf-sf-app-0_auth",
-      "database_id": "457745a6-eb45-480e-8b12-5726979d458e"  // This placeholder will be replaced during deployment
+      "database_id": "457745a6-eb45-480e-8b12-5726979d458e" // This placeholder will be replaced during deployment
     }
   ],
   "kv_namespaces": [
@@ -22,14 +24,16 @@
       "binding": "SESSIONS_KV",
       "id": "54bc00799c5641f1b1b7494abcd01865"
     }
-  ]
-  // only keep the scopes updating everything else is a secret that does not track the vars
-  ,
+  ],
+  "keep_vars": true,
   "vars": {
+    // .dev.vars contains development versions 
+    // Use these only to set up production vars then manage in cloudflare console as secrets
     // "SHOPIFY_API_KEY": "X",
     // "SHOPIFY_API_SECRET": "X",
     // "SHOPIFY_APP_URL": "X",
+    // "SHOPIFY_APP_HANDLE": "X",
+    // "SHOPIFY_APP_ID": "X",
     "SCOPES": "write_products"
   }
-  
 }
