@@ -27,7 +27,7 @@ declare global {
 
 /**
  * Initialize the session storage by passing a reference to the binding for KV
- * This function must be called before any Shopify app operations. It is called in the load context.
+ * It is called in the load context before the shopify app is initialized that is why it uses globalThis for a higher scope
  */
 export const initKvSessionStorage = (kvNamespace: KVNamespace) => {
  if (!globalThis.shopifySessionStorage) {
@@ -72,46 +72,23 @@ const getShopifyApp = () => {
   return (globalThis.shopifyAppInstance = shopifyApp(shopifyConfig));
 };
 
-// Getter for the current session storage instance
-// Always get sessionStorage from the current app instance to ensure proper initialization
-export const getSessionStorage = () => {
-  return getShopifyApp().sessionStorage;
-};
-
 export const apiVersion = ApiVersion.January25;
 
-// Lazy-load the shopify app when these functions are called
-export const addDocumentResponseHeaders = (response: Response, request: Request) => {
-  return getShopifyApp().addDocumentResponseHeaders(response, request);
-};
+export const getSessionStorage = () => getShopifyApp().sessionStorage;
+
+export const addDocumentResponseHeaders = (request: Request, headers: Headers) => getShopifyApp().addDocumentResponseHeaders(request, headers);
 
 export const authenticate = {
-  admin: (request: Request) => {
-    return getShopifyApp().authenticate.admin(request);
-  },
-  public: (request: Request) => {
-    return getShopifyApp().authenticate.public(request);
-  },
-  webhook: (request: Request) => {
-    return getShopifyApp().authenticate.webhook(request);
-  }
+  admin: (request: Request) => getShopifyApp().authenticate.admin(request),
+  public: (request: Request) => getShopifyApp().authenticate.public(request),
+  webhook: (request: Request) => getShopifyApp().authenticate.webhook(request)
 };
-
 
 export const unauthenticated = {
-  admin: (request: Request) => {
-    return getShopifyApp().unauthenticated.admin(request);
-  },
-  public: (request: Request) => {
-    return getShopifyApp().unauthenticated.public(request);
-  }
+  admin: (request: Request) => getShopifyApp().unauthenticated.admin(request),
+  public: (request: Request) => getShopifyApp().unauthenticated.public(request)
 };
 
-export const login = (request: Request) => {
-  return getShopifyApp().login(request);
-};
+export const login = (request: Request) => getShopifyApp().login(request);
 
-export const registerWebhooks = (request: Request) => {
-  return getShopifyApp().registerWebhooks(request);
-};
-
+export const registerWebhooks = (request: Request) => getShopifyApp().registerWebhooks(request);
