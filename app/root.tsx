@@ -6,6 +6,7 @@ import {
   ScrollRestoration,
 } from "@remix-run/react";
 import { useClientLog } from "./resources/hooks/useClientLog";
+import { LoadingIndicator } from "./resources/global-components";
 
 export default function App() {
   useClientLog();
@@ -23,6 +24,10 @@ export default function App() {
           rel="stylesheet"
           href="/the-polaris.css"
         /> 
+        <link
+          rel="stylesheet"
+          href="/global.css"
+        /> 
         <Meta />
         <Links />
       </head>
@@ -30,6 +35,7 @@ export default function App() {
         <Outlet />
         <ScrollRestoration />
         <Scripts />
+        <LoadingIndicator/>
       </body>
     </html>
   );

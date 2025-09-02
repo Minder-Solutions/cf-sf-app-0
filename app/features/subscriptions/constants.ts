@@ -17,6 +17,8 @@ export const allAccessKey = 'all_access';
  * all settings made here:
  * https://shopify.dev/docs/apps/launch/billing/managed-pricing
  * are re-entered here exactly.
+ *  redirect url
+ *  subscriptions -> app.subscriptions
  */
 
 export const subscriptions = [

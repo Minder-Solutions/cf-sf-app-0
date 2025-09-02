@@ -4,6 +4,8 @@ interface Env {
 	SESSIONS_KV: KVNamespace;
 	SCOPES: "write_products";
 	DB: D1Database;
+  SHOPIFY_APP_HANDLE: string;
+  SHOPIFY_APP_ID: string;
 }
 
 

@@ -80,14 +80,14 @@ export const addDocumentResponseHeaders = (request: Request, headers: Headers) =
 
 export const authenticate = {
   admin: (request: Request) => getShopifyApp().authenticate.admin(request),
-  public: (request: Request) => getShopifyApp().authenticate.public(request),
+  // public: (request: Request) => getShopifyApp().authenticate.public(request),
   webhook: (request: Request) => getShopifyApp().authenticate.webhook(request)
 };
 
-export const unauthenticated = {
-  admin: (request: Request) => getShopifyApp().unauthenticated.admin(request),
-  public: (request: Request) => getShopifyApp().unauthenticated.public(request)
-};
+// export const unauthenticated = {
+  // admin: (request: Request) => getShopifyApp().unauthenticated.admin(request),
+  // public: (request: Request) => getShopifyApp().unauthenticated.public(request)
+// };
 
 export const login = (request: Request) => getShopifyApp().login(request);
 
