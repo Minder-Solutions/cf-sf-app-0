@@ -1,6 +1,6 @@
 {
   "name": "cf-sf-app-0",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "cloudflare workers host shopify app cloudflare tunnel in scripts command for dev",
   "myBuildNoteWrangler": {
     "wrangler-versions": "on the main branch wrangler needs to be at 4, when running cf:dev wrangler needs to be at 3",
