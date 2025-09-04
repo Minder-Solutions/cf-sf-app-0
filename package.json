@@ -75,7 +75,10 @@
     "typegen": "wrangler types",
     "cf:tunnel": "cloudflared tunnel run --token $CF_TUNNEL_TOKEN",
     "cf:dev": "shopify app dev --tunnel-url https://dev-tunnel.minder.solutions:5500",
-    "packages:show": "npm list --depth=0"
+    "packages:show": "npm list --depth=0",
+    "drizzle:pull": "drizzle-kit pull",
+    "drizzle:push:safe": "drizzle-kit push:sqlite --config drizzle.push.config.ts",
+    "drizzle:push": "drizzle-kit push  --config drizzle.config.ts"
   },
   "sideEffects": false,
   "type": "module"
