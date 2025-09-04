@@ -6,10 +6,14 @@ import {
 } from "@shopify/polaris";
 
 import { authenticate } from "app/shopify.server";
+import { drizzle } from 'drizzle-orm/d1';
 
 
 export const loader = async ({ request, context }: LoaderFunctionArgs) => {
- await authenticate.admin(request);
+  await authenticate.admin(request);
+  const db = drizzle(context.cloudflare.env.DB);
+  // 
+  // const result = await db.select().from(users).all()
 
  return {}
  };
