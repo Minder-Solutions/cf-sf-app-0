@@ -16,7 +16,8 @@
     {
       "binding": "DB",
       "database_name": "cf-sf-app-0_auth",
-      "database_id": "457745a6-eb45-480e-8b12-5726979d458e" // This placeholder will be replaced during deployment
+      "database_id": "457745a6-eb45-480e-8b12-5726979d458e",
+      "migrations_dir": "drizzle-db/migrations"
     }
   ],
   "kv_namespaces": [

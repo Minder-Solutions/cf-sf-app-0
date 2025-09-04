@@ -30,6 +30,7 @@
     "@shopify/polaris": "^13.9.5",
     "@shopify/shopify-app-remix": "^3.8.2",
     "@shopify/shopify-app-session-storage-kv": "^4.0.20",
+    "drizzle-orm": "^0.44.5",
     "isbot": "^5.1.26",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
@@ -41,12 +42,14 @@
     "@types/react-dom": "18.3.1",
     "@typescript-eslint/eslint-plugin": "8.31.0",
     "@typescript-eslint/parser": "8.31.0",
+    "drizzle-kit": "^0.31.4",
     "eslint": "9.25.1",
     "eslint-import-resolver-typescript": "3.7.0",
     "eslint-plugin-import": "2.31.0",
     "eslint-plugin-jsx-a11y": "6.10.2",
     "eslint-plugin-react": "7.37.5",
     "eslint-plugin-react-hooks": "5.2.0",
+    "tsx": "^4.20.5",
     "typescript": "5.8.3",
     "vite": "^5.4.18",
     "vite-tsconfig-paths": "^5.1.4",
@@ -71,7 +74,11 @@
     "typegen": "wrangler types",
     "cf:tunnel": "cloudflared tunnel run --token $CF_TUNNEL_TOKEN",
     "cf:dev": "shopify app dev --tunnel-url https://dev-tunnel.minder.solutions:5500",
-    "packages:show": "npm list --depth=0"
+    "packages:show": "npm list --depth=0",
+    "drizzle:generate": "drizzle-kit generate --config=drizzle-db/drizzle.generate.config.ts --name=test",
+    "drizzle:studio": "drizzle-kit studio --config=drizzle-db/drizzle.studio.config.ts",
+    "db:migrate:production": "npx wrangler@4 d1 migrations apply DB --remote",
+    "db:migrate:development": "npx wrangler@4  d1 migrations apply DB --local"
   },
   "sideEffects": false,
   "type": "module"
