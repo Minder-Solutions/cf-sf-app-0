@@ -11,6 +11,6 @@ export default defineConfig({
     databaseId: process.env.CLOUDFLARE_DATABASE_ID!,
     token: process.env.CLOUDFLARE_D1_TOKEN!,
   },
-  // Only introspect the example_table, ignoring shopify_sessions
-  tablesFilter: ['example_table'],
+  // Only introspect the listed tables
+  tablesFilter: ['example_table', 'subscription_tracking'],
 });
