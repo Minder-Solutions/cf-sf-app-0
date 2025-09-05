@@ -43,6 +43,7 @@
     "@types/react-dom": "18.3.1",
     "@typescript-eslint/eslint-plugin": "8.31.0",
     "@typescript-eslint/parser": "8.31.0",
+    "better-sqlite3": "^12.2.0",
     "drizzle-kit": "^0.31.4",
     "eslint": "9.25.1",
     "eslint-import-resolver-typescript": "3.7.0",
@@ -77,8 +78,8 @@
     "cf:dev": "shopify app dev --tunnel-url https://dev-tunnel.minder.solutions:5500",
     "packages:show": "npm list --depth=0",
     "drizzle:pull": "drizzle-kit pull",
-    "drizzle:push:safe": "drizzle-kit push:sqlite --config drizzle.push.config.ts",
-    "drizzle:push": "drizzle-kit push  --config drizzle.config.ts"
+    "drizzle:push:cf": "drizzle-kit push  --config drizzle.config.ts",
+    "drizzle:push:local": "drizzle-kit push --config drizzle.local.config.ts"
   },
   "sideEffects": false,
   "type": "module"

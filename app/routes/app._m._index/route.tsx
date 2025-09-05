@@ -7,15 +7,17 @@ import {
 
 import { authenticate } from "app/shopify.server";
 import { drizzle } from 'drizzle-orm/d1';
+import { exampleTable, subscriptionTracking } from '../../../drizzle-db/schema'
 
 
 export const loader = async ({ request, context }: LoaderFunctionArgs) => {
   await authenticate.admin(request);
   const db = drizzle(context.cloudflare.env.DB);
   // 
-  // const result = await db.select().from(users).all()
+  const examples = await db.select().from(exampleTable).all()
+  const subsderibers = await db.select().from(subscriptionTracking).all()
 
- return {}
+ return {examples,  subsderibers}
  };
 
 
