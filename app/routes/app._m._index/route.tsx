@@ -12,31 +12,31 @@ import { exampleTable, subscriptionTracking } from 'drizzle-db/schema'
 
 export const loader = async ({ request, context }: LoaderFunctionArgs) => {
   await authenticate.admin(request);
-  const db = drizzle(context.cloudflare.env.DB);
-  // 
-  const examples = await db.select().from(exampleTable).all()
-  const _subscribers = await db.select().from(subscriptionTracking).all()
-  if(_subscribers.length === 0) {
-    // https://orm.drizzle.team/docs/insert
-  type Subscriber = typeof subscriptionTracking.$inferInsert;
-  const seedSubcriber : Subscriber = {
-    id: 'string_id',
-    shopifySubscriptionId: 'string_a',
-    chargeId: 'string_b',
-    shopDomain: 'string_c',
-    name: 'Monthly',
-    status: 'string',
-    trialDays: 22,
-    createdAt: 'string',
-    }
-    await db.insert(subscriptionTracking).values(seedSubcriber);
-  }
+  // const db = drizzle(context.cloudflare.env.DB);
+  // // 
+  // const examples = await db.select().from(exampleTable).all()
+  // const _subscribers = await db.select().from(subscriptionTracking).all()
+  // if(_subscribers.length === 0) {
+  //   // https://orm.drizzle.team/docs/insert
+  // type Subscriber = typeof subscriptionTracking.$inferInsert;
+  // const seedSubcriber : Subscriber = {
+  //     shopifySubscriptionId: 'string_a',
+  //     chargeId: 'string_b',
+  //     shopDomain: 'string_c',
+  //     name: 'Monthly',
+  //     status: 'string',
+  //     trialDays: 22,
+  //     createdAt: 'string',
+  //   }
+  //   await db.insert(subscriptionTracking).values(seedSubcriber);
+  // }
   
 
   
-  const subscribers = await db.select().from(subscriptionTracking).all()
+  // const subscribers = await db.select().from(subscriptionTracking).all()
 
-  return {examples,  _subscribers, subscribers}
+  // return {examples,  _subscribers, subscribers}
+  return null;
 };
 
 
@@ -50,7 +50,7 @@ export default function Index() {
   const aData = useActionData<typeof action>();
   return (
 <Page>
-  <h1>11</h1>
+  <h1>11 Hello</h1>
 </Page>
   );
 }

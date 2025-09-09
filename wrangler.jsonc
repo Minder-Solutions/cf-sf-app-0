@@ -35,6 +35,7 @@
     // "SHOPIFY_APP_URL": "X",
     // "SHOPIFY_APP_HANDLE": "X",
     // "SHOPIFY_APP_ID": "X",
+    "EMAIL_ADDRESS_TOKEN":"MS._d7Jq3wX8vL-qYp2LcZBsTt.oA4GiL-xekW9PdQnHXIZnQy582KJdrV1yuEVkzOCwq",
     "SCOPES": "write_products"
   }
 }

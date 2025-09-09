@@ -6,17 +6,13 @@ import {getAppUrl} from "app/features/resource-locations/appUrl";
 import { availableIfMetafields } from "./appData";
 import { allAccessName, starterName } from "app/features/subscriptions/constants";
 import { getCurrentTrialDays } from "app/features/subscriptions/appInstallationBilling";
+import { subscriptionTracking } from 'drizzle-db/schema'
+import { drizzle } from 'drizzle-orm/d1';
 
-// Use ther D1 binding in wrangler.jsonc
-// import db from "../../db.server";
 
-
-type UserInput = { 
-  title: string;
-}
-
-export async function action({request, params}: ActionFunctionArgs) {
-  const { admin, redirect, billing } = await authenticate.admin(request);
+export async function action({request, params, context}: ActionFunctionArgs) {
+  const { billing } = await authenticate.admin(request);
+  const db = drizzle(context.cloudflare.env.DB);
 
   //@ts-ignore
   const billingCheck = await billing.check();
@@ -46,27 +42,27 @@ export async function loader ({ request, context, params }: LoaderFunctionArgs) 
     throw new Response('Cannot read from the app installation. Please check network connections and try refreshing your browser.')
   }
 
-  /* Keep track of when people subsribe using D1 in order to send a reminder email 
+  /* Keep track of when people subsribe using D1 in order to send a reminder email */
+  const db = drizzle(context.cloudflare.env.DB);
+  type Subscriber = typeof subscriptionTracking.$inferInsert;
   if(chargeId) {
-    //it is a redirect from the shopify manage billing update db
-    const entry = {
+    const entry: Subscriber = {
         shopifySubscriptionId: subscription.id,
         shopDomain: session.shop,
         name: subscription.name,
         status: subscription.status,
         trialDays: subscription.trialDays,
-        createdAt: new Date(subscription.createdAt),
+        createdAt: subscription.createdAt, // ISO-8601
+        chargeId,
       }
-    await db.subscriptionTracking.upsert({
-      where: {
-        shopDomain: session.shop,
-      },
-      update: entry,
-      create: entry
-    });
+    await db
+      .insert(subscriptionTracking)
+      .values(entry)
+      .onConflictDoUpdate({
+        target: subscriptionTracking.shopDomain,
+        set: entry
+      });
   }
-*/
-
 
   const appUrl = getAppUrl({appId: context.cloudflare.env?.SHOPIFY_APP_ID, appHandle: context.cloudflare.env?.SHOPIFY_APP_HANDLE });
   return { billingCheck, subscription, chargeId, appInstallation, appUrl }

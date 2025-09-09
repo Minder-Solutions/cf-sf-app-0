@@ -6,6 +6,7 @@ interface Env {
 	DB: D1Database;
   SHOPIFY_APP_HANDLE: string;
   SHOPIFY_APP_ID: string;
+  EMAIL_ADDRESS_TOKEN: string;
 }
 
 

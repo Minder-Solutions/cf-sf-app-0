@@ -2,7 +2,7 @@ import * as t from "drizzle-orm/sqlite-core"
 
 
 export const subscriptionTracking = t.sqliteTable('subscription_tracking', {
-  id: t.text('id').primaryKey().notNull(),
+  id: t.integer("id").primaryKey(),
   shopifySubscriptionId: t.text('shopify_subscription_id').notNull().unique(),
   chargeId: t.text('charge_id').notNull(),
   shopDomain: t.text('shop_domain').notNull().unique(),

@@ -84,10 +84,10 @@ export const authenticate = {
   webhook: (request: Request) => getShopifyApp().authenticate.webhook(request)
 };
 
-// export const unauthenticated = {
-  // admin: (request: Request) => getShopifyApp().unauthenticated.admin(request),
+export const unauthenticated = {
+  admin: (shop: string) => getShopifyApp().unauthenticated.admin(shop),
   // public: (request: Request) => getShopifyApp().unauthenticated.public(request)
-// };
+};
 
 export const login = (request: Request) => getShopifyApp().login(request);
 
