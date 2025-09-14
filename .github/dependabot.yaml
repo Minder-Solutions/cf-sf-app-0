@@ -1,0 +1,21 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/" # location of package.json
+    schedule:
+      interval: "monthly"
+      time: "04:00"
+    commit-message:
+      prefix: "deps"
+    allow:
+      - dependency-name: "@remix-run/*"
+      - dependency-name: "react"
+      - dependency-name: "react-dom"
+    ignore:
+      - dependency-name: "@remix-run/*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react-dom"
+        update-types: ["version-update:semver-major"]
+    open-pull-requests-limit: 2
