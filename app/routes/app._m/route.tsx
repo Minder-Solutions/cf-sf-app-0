@@ -25,5 +25,5 @@ export async function loader ({ request, params, context }: LoaderFunctionArgs) 
  * @see https://remix.run/docs/en/main/file-conventions/routes#nested-layouts-without-nested-urls
  */
 export default function M() {
-  return <div>hello<Outlet/></div>
+  return <Outlet/>
 }

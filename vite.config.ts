@@ -3,17 +3,24 @@ import {
   vitePlugin as remix,
   cloudflareDevProxyVitePlugin,
 } from "@remix-run/dev";
-import { installGlobals } from "@remix-run/node";
+
 import tsconfigPaths from "vite-tsconfig-paths";
 import { getLoadContext } from "./load-context";
 
-installGlobals({ nativeFetch: true });
+// EXAMPLE from cloudflare: https://github.com/Minder-Solutions/remix-starter-template/blob/main/vite.config.ts
+// NOT SURE (for single fetch?)
+// import { installGlobals } from "@remix-run/node";
+// installGlobals({ nativeFetch: true });
 
+// This is for creating the right type inferences when single-fetch is enabled
+// https://v2.remix.run/docs/guides/single-fetch/#enable-single-fetch-types
+/** 
 declare module "@remix-run/cloudflare" {
   interface Future {
     v3_singleFetch: true;
   }
 }
+*/
 
 // Handle Shopify environment variables
 if (
@@ -67,7 +74,7 @@ export default defineConfig({
         v3_fetcherPersist: true,
         v3_relativeSplatPath: true,
         v3_throwAbortReason: true,
-        v3_singleFetch: true,
+        // v3_singleFetch: true,
         v3_lazyRouteDiscovery: true,
         v3_routeConfig: true,
       },
